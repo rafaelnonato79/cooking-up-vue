@@ -1,38 +1,42 @@
 <script lang="ts">
+import { createEmitAndSemanticDiagnosticsBuilderProgram } from 'typescript';
 import SelecionarIngredientes from './SelecionarIngredientes.vue';
+import SuaLista from './SuaLista.vue';
+import Tag from './Tag.vue';
+import BotaoPrincipal from './BotaoPrincipal.vue';
+import Rodape from './Rodape.vue';
 
-export default{
-    data(){
-        return{
-            ingredientes: ['Alho', 'Manteiga', 'Orégano']
-        }
+export default {
+  data() {
+    return {
+      ingredientes: [] as string[]
+    };
+  },
+  components: { SelecionarIngredientes, Tag, SuaLista, BotaoPrincipal, Rodape },
+  methods: {
+    adicionarIngrediente(ingrediente: string){
+      this.ingredientes.push(ingrediente)
     },
-    components: {SelecionarIngredientes}
+    removerIngrediente(ingrediente: string){
+      const index = ingrediente.indexOf(ingrediente)
+      this.ingredientes.splice(index,1)
+    }
+  }
 }
 </script>
 
 <template>
-    <main class="conteudo-principal">
-        <section>
-            <span class="subtitulo-lg sua-lista-texto">
-                Sua lista:
-            </span>
+  <main class="conteudo-principal">
+    <SuaLista :ingredientes="ingredientes" />
 
-            <ul v-if="ingredientes.length" class="ingredientes-sua-lista">
-                <li v-for="ingrediente in ingredientes" :key="ingrediente" class="ingrediente">
-                    {{ ingrediente }}
-                </li>
-            </ul>
+    <SelecionarIngredientes 
+      @adicionar-ingrediente="adicionarIngrediente"
+      @remover-ingrediente="removerIngrediente"
+    />
 
-            <p v-else class="paragrafo lista-vazia">
-                <img src="../assets/imagens/icones/lista-vazia.svg" alt="Icone de pesquisa">
-                Sua lista está vazia, selecione ingredientes para iniciar
-            </p>
-        </section>
-
-        <SelecionarIngredientes/>
-
-    </main>
+    <BotaoPrincipal/>
+  </main>
+  <Rodape/>
 </template>
 
 <style scoped>
@@ -60,18 +64,6 @@ export default{
   justify-content: center;
   gap: 1rem 1.5rem;
   flex-wrap: wrap;
-}
-
-.ingrediente {
-  display: inline-block;
-  border-radius: 0.5rem;
-  min-width: 4.25rem;
-  padding: 0.5rem;
-  text-align: center;
-    transition: 0.2s;
-    color: var(--creme, #FFFAF3);
-  background: var(--coral, #F0633C);
-  font-weight: 700;
 }
 
 .lista-vazia {
