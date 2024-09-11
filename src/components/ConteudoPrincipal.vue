@@ -3,16 +3,18 @@ import { createEmitAndSemanticDiagnosticsBuilderProgram } from 'typescript';
 import SelecionarIngredientes from './SelecionarIngredientes.vue';
 import SuaLista from './SuaLista.vue';
 import Tag from './Tag.vue';
-import BotaoPrincipal from './BotaoPrincipal.vue';
 import Rodape from './Rodape.vue';
+import MostrarReceitas from './MostrarReceitas.vue';
 
+type Pagina = 'SelecinonarIngredientes'| 'MostrarReceitas';
 export default {
   data() {
     return {
-      ingredientes: [] as string[]
+      ingredientes: [] as string[],
+      conteudo: 'SelecinonarIngredientes' as Pagina
     };
   },
-  components: { SelecionarIngredientes, Tag, SuaLista, BotaoPrincipal, Rodape },
+  components: { SelecionarIngredientes, Tag, SuaLista, Rodape, MostrarReceitas },
   methods: {
     adicionarIngrediente(ingrediente: string){
       this.ingredientes.push(ingrediente)
@@ -20,6 +22,9 @@ export default {
     removerIngrediente(ingrediente: string){
       const index = ingrediente.indexOf(ingrediente)
       this.ingredientes.splice(index,1)
+    },
+    navegar(pagina: Pagina){
+      this.conteudo = pagina;
     }
   }
 }
@@ -29,12 +34,21 @@ export default {
   <main class="conteudo-principal">
     <SuaLista :ingredientes="ingredientes" />
 
-    <SelecionarIngredientes 
-      @adicionar-ingrediente="adicionarIngrediente"
-      @remover-ingrediente="removerIngrediente"
-    />
+    <!-- componente para preservar os componentes que tem dentro dele -->
 
-    <BotaoPrincipal/>
+    <KeepAlive include="SelecionarIngredientes">
+      <SelecionarIngredientes v-if="conteudo === 'SelecinonarIngredientes'" 
+        @adicionar-ingrediente="adicionarIngrediente"
+        @remover-ingrediente="removerIngrediente"
+        @buscar-receitas="navegar('MostrarReceitas')"
+      />
+  
+      <MostrarReceitas v-else-if="conteudo==='MostrarReceitas'"
+      :ingredientes="ingredientes"
+      @editar-lista="navegar('SelecinonarIngredientes')"
+      />
+    </KeepAlive>
+
   </main>
   <Rodape/>
 </template>
